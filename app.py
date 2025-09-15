@@ -29,9 +29,6 @@ max_cantidad_municipio = df['MUNICIPIO_HECHOS'].value_counts().iloc[0]
 etapa_mas_frecuente = df['ETAPA'].value_counts().index[0]
 # Ya que value_counts() genera un dataframe ordenada, traigo solo EL PRIMER iNDICE. iloc[0]
 cant_etapa_mas_frecuente = df['ETAPA'].value_counts().iloc[0]
-
-st.write(etapa_mas_frecuente)
-
 st.subheader('Comportamiento Delitos')
 delitos = df['DELITO'].value_counts()
 st.write(delitos)
@@ -60,4 +57,57 @@ st.subheader('Tipo de Delito')
 delitos = df['DELITO'].value_counts()
 st.bar_chart(delitos)
 
+                                            #CONSTRUIR PAGINA
+st.set_page_config(page_title="Dashboard Delitos - Fiscalía", layout="wide")
+st.markdown(
+    """
+    <style>
+        .block-container {
+            padding: 1rem 2rem 2rem 2rem;
+            max-width: 1600px;
+    }
+    </stile>
+    """,
+    unsafe_allow_html=True
+)
 
+st.image('img/fondo.png', use_container_width=True)
+st.markdown("#<font color = #3B668C> TITULO </font>", unsafe_allow_html=True)
+
+#Grafico de barras apiladas por departamento y tipó de delito
+st.subheader('Delitos por Departamentos')
+df_delitos = df.groupby(['DEPARTAMENTO', 'DELITO']).size().reset_index(name='conteo')
+fig = px.bar(df_delitos, x='DEPARTAMENTO', y='conteo', color='DELITO', barmode='stack')
+st.plotly_chart(fig,key= "bar_departamentos")
+fig.update_layout(showlegend=False, height=200)
+
+#CREAR 4 COLUMNAS PARA LAS TARJETAS
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+
+#TARJETAS
+    ## TARJETA 1 - MUNICIPIO CON MAS DELITOS
+    st.markdown(f"""<h3 style=
+                'color: #F2A88D;
+                background-color: #FFF6F5;
+                border: 2px solid #F2A88D;
+                border-radius: 10px; padding: 10px;
+                text-align: center'>
+                Municipios con mas delitos: {max_municipio}</h3><br>""",
+                unsafe_allow_html=True)
+
+with col2:
+    ## tARJETA 2 - cANTIDAD DE DELITOS EN EL MUNICIPIO CON MAS DELITOS
+    st.markdown(f"""<h3 style=
+                'color: #F2A88D;
+                background-color: #FFF6F5;
+                border: 2px solid #F2A88D;
+                border-radius: 10px; padding: 10px;
+                text-align: center'>
+                Delitos Repotados<br>{max_cantidad_municipio}</h3><br>""",
+                unsafe_allow_html=True)
+
+                    
+
+                    # DATOS VIEJOS
