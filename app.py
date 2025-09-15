@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import plotly.express as px
 
 url = 'https://github.com/joshuaconvoy-commits/Curso-de-IA-universidad-de-Medell-n/raw/refs/heads/main/datos_generales_ficticios.csv'
 df = pd.read_csv(url, sep=';', encoding= 'latin 1')
@@ -19,15 +20,44 @@ df['FECHA_HECHOS'] = pd.to_datetime(df['FECHA_HECHOS'], errors='coerce')
 df['FECHA_HECHOS'] = df['FECHA_HECHOS'].dt.date
 
 #CALCULO DE MUNICIPIO CON MAS DELITOs
-max_municipio = df['MUNICIPIO_HECHOS'].value_counts().value_counts().iloc[0]
+max_municipio = df['MUNICIPIO_HECHOS'].value_counts().index[0].upper()
 st.write(f'Municipio TOP Delitos:{max_municipio}')
 max_cantidad_municipio = df['MUNICIPIO_HECHOS'].value_counts().iloc[0]
 
-#CONSTRUIR LA PAGINA
-st.set_page_config(page_title="Dasbohard de Delitos - Fiscalía", layout="centered")
-st.header("Dasbohard de Delitos - Fiscalía")
-#st.markdown(f"<center><h2>Dasbohard de Delitos - Fiscalía</h2></center>", unsafe_allow_html=True)
+#CALCULO DE LA ETAPA QUE MAS VECES SE PRESENTA
+# Ya que value_counts() genera un dataframe ordenada, traigo solo EL PRIMER iNDICE. index[0]
+etapa_mas_frecuente = df['ETAPA'].value_counts().index[0]
+# Ya que value_counts() genera un dataframe ordenada, traigo solo EL PRIMER iNDICE. iloc[0]
+cant_etapa_mas_frecuente = df['ETAPA'].value_counts().iloc[0]
 
-st.dataframe(df)
+st.write(etapa_mas_frecuente)
 
-st.write(f"### Municipio con más delitos: {max_municipio} con {max_cantidad_municipio} reportes")
+st.subheader('Comportamiento Delitos')
+delitos = df['DELITO'].value_counts()
+st.write(delitos)
+st.bar_chart(delitos)
+
+st.subheader('Comportamiento Departamentos')
+departamentos = df['DEPARTAMENTO'].value_counts()
+st.write(departamentos)
+st.bar_chart(departamentos)
+
+st.subheader('Distribución por departamentos')
+fig = px.pie(
+    values=departamentos.values,
+    names=departamentos.index             
+)
+fig.update_traces(textposition='inside', textinfo='percent+label')
+fig.update_layout(showlegend=False, height=400)
+st.plotly_chart(fig)
+
+df_delitos = df.groupby(['DEPARTAMENTO', 'DELITO']).size().reset_index(name='conteo')
+fig = px.bar(df_delitos, x='DEPARTAMENTO', y='conteo', color='DELITO', barmode='stack')
+st.plotly_chart(fig)
+st.write(df_delitos)
+
+st.subheader('Tipo de Delito')
+delitos = df['DELITO'].value_counts()
+st.bar_chart(delitos)
+
+
