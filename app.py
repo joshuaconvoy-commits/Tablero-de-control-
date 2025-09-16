@@ -71,7 +71,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.image('img/fondo.png', use_container_width=True)
+st.image('img/Fiscalia.png', use_container_width=True)
 st.markdown("#<font color = #3B668C> TITULO </font>", unsafe_allow_html=True)
 
 #Grafico de barras apiladas por departamento y tipó de delito
