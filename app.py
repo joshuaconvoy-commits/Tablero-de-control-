@@ -5,6 +5,9 @@ import plotly.express as px
 url = 'https://github.com/joshuaconvoy-commits/Curso-de-IA-universidad-de-Medell-n/raw/refs/heads/main/datos_generales_ficticios.csv'
 df = pd.read_csv(url, sep=';', encoding= 'latin 1')
 
+url_mapa = "https://github.com/juliandariogiraldoocampo/ia_taltech/raw/refs/heads/main/fiscalia/datos_mapa.csv"
+df_mapa = pd.read_csv(url_mapa)
+
 st.dataframe(df)
 
 #Crear lista de las columnas de Interes
@@ -74,6 +77,23 @@ st.markdown(
 st.image('img/Fiscalia.png', use_container_width=True)
 st.markdown("#<font color = #3B668C> TITULO </font>", unsafe_allow_html=True)
 
+fig = px.scatter_map(
+    df_mapa,
+    lat="Lat",
+    lon="Long",
+    color="CATEGORIA",
+    color_discrete_sequence=px.colors.qualitative.Antique,
+	#color_discrete_sequence=px.colors.sequential.Viridis,
+	hover_name="NOMBRE",
+	size_max=25,
+	height=700,
+    zoom=12,
+	map_style="open-street-map"
+	#map_style="carto-darkmatter"
+	# map_style="carto-positron"
+)
+st.plotly_chart(fig)
+
 #Grafico de barras apiladas por departamento y tipó de delito
 st.subheader('Delitos por Departamentos')
 df_delitos = df.groupby(['DEPARTAMENTO', 'DELITO']).size().reset_index(name='conteo')
@@ -108,6 +128,68 @@ with col2:
                 Delitos Repotados<br>{max_cantidad_municipio}</h3><br>""",
                 unsafe_allow_html=True)
 
-                    
+with col3:
+    ## tARJETA 3 - ETAPA MAS RECURRENTE
+    st.markdown(f"""<h3 style=
+                'color: #F2A88D;
+                background-color: #FFF6F5;
+                border: 2px solid #F2A88D;
+                border-radius: 10px; padding: 10px;
+                text-align: center'>
+                Etapa mas recurrente<br>{etapa_mas_frecuente}</h3><br>""",
+                unsafe_allow_html=True)
 
-                    # DATOS VIEJOS
+with col4:
+    ## tARJETA 4 - CANTIDAD DE REGISTROS DE LA ETAPA MAS RECURRENTE
+    st.markdown(f"""<h3 style=
+                'color: #F2A88D;
+                background-color: #FFF6F5;
+                border: 2px solid #F2A88D;
+                border-radius: 10px; padding: 10px;
+                text-align: center'>
+                Procesos en Esta Etapa<br>{cant_etapa_mas_frecuente}</h3><br>""",
+                unsafe_allow_html=True)  
+    
+col5,col6 = st.columns(2)
+with col5:
+    st.subheader('Tipo Delitos')
+    tipo_delitos = df['DELITO'].value_counts()
+    st.bar_chart(tipo_delitos)
+
+with col6:  
+    st.subheader('Distribución por Departamentos')
+    departamento = df['DEPARTAMENTO'].value_counts()
+    fig = px.pie(
+        values=departamentos.values,
+        names=departamentos.index             
+    )
+    fig.update_traces(textposition='inside', textinfo='percent+label')
+    fig.update_layout(showlegend=False, height=400)
+    st.plotly_chart(fig, key='torta_departamentos')
+
+ #Seleccion de dato para visualizar
+cols_grafico = ['DELITO', 'ETAPA', 'FISCAL_ASIGNADO', 'DEPARTAMENTO', 'MUNICIPIO_HECHOS']
+df_grafico = df[cols_grafico]
+
+st.subheader('Seleccione Dato a Visualizar')
+variable = st.selectbox(
+    'Seleccione una variable',
+     options= df_grafico.columns) 
+
+# st.subheader('Tipo Delitos')
+grafico = df_grafico[variable].value_counts()
+st.bar_chart(grafico)
+
+if st.checkbox('Mostrar Matriz de Datos'):    
+    st.subheader('Matriz de Datos')
+    st.dataframe(df_grafico)
+
+#Consula por fiscal asignado
+st.header('Consulta por Fiscal Asignado')
+fiscal_consulta = st.selectbox(
+    'Seleccione El Fiscal a Consultar:',
+    options=df['FISCAL_ASIGNADO'].unique()  
+)    
+df_fiscal = df[df['FISCAL_ASIGNADO'] == fiscal_consulta]
+st.dataframe(df_fiscal)
+                
