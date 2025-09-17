@@ -192,4 +192,6 @@ fiscal_consulta = st.selectbox(
 )    
 df_fiscal = df[df['FISCAL_ASIGNADO'] == fiscal_consulta]
 st.dataframe(df_fiscal)
+
+
                 
